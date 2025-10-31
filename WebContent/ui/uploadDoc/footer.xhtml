@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html lang="#{lanBean.language}" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<f:view locale="#{lanBean.locale}">
+	<h:head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<ui:define name="windowTitle">
+            #{label.vahanTitle}
+        </ui:define>
+	</h:head>
+	<h:body>
+
+
+		<div class="footer-section top-space">
+			 
+				<div class="ui-grid-row">
+					<div class="ui-grid-col-3">
+						<div class="inline-section">
+							<a href="http://www.nic.in/" target="_blank"> <p:graphicImage
+									library="images" name="nic-logo.png" height="50"
+									style="padding:6px" /></a>
+						</div>
+					</div>
+
+
+
+			</div>
+
+			<div class="center-position">
+				<div class="ui-grid-row bottom-space">
+					<div class="ui-grid-col-12 center-position">
+						<div class="font-bold">#{lang['labelname.buildversion']}</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</h:body>
+</f:view>
+</html>

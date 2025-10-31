@@ -1,0 +1,151 @@
+@CHARSET "ISO-8859-1";
+
+@media screen and (max-width: 500px) {
+	.slogan-name {
+		font-size: 50%;
+	}
+	.vertical-right-divider {
+		width: 90px;
+	}
+	.logo_citizen_service {
+		width: 100%;
+	}
+	.nav-container {
+		background: none;
+	}
+	.respswachh-bharat-logo {
+		width: 200px;
+	}
+	.respTD {
+		width: 20%;
+	}
+	.bharat_sarakar, .gov_india_citizen {
+		font-size: 64%;
+	}
+	.width_20 {
+		width: 20px;
+	}
+	.dis_none {
+		display: none !important;
+	}
+	.resp-mob h1{
+	font-size: 26px;
+	}
+	.resp-mob, resp-mob img {
+	text-align: center;
+	}
+	.top-space{
+	margin-top: 0px;
+	}
+	.ui-datatable thead th{
+	
+	font-size:14px;
+	font-weight:normal;
+	}
+}
+/* Landscape */
+@media only screen and (min-device-width : 768px) and (max-device-width
+	: 1024px) and (orientation : landscape) {
+	.slogan-name {
+		font-size: 100%;
+	}
+	.vertical-right-divider {
+		width: 150px;
+	}
+	.logo_citizen_service {
+		width: 100%;
+	}
+	.nav-container {
+		background: none;
+	}
+	.respswachh-bharat-logo {
+		width: 100px;
+	}
+	.respTD {
+		width: 20%;
+	}
+	.bharat_sarakar, .gov_india_citizen {
+		font-size: 90%;
+	}
+	.width_20 {
+		width: 20px;
+	}
+	.dis_none {
+		display: none !important;
+	}
+}
+
+/* Portrait */
+@media only screen and (min-device-width : 768px) and (max-device-width
+	: 1024px) and (orientation : portrait) {
+	.slogan-name {
+		font-size: 100%;
+	}
+	.vertical-right-divider {
+		width: 150px;
+	}
+	.logo_citizen_service {
+		width: 100%;
+	}
+	.nav-container {
+		background: none;
+	}
+	.respswachh-bharat-logo {
+		width: 100px;
+	}
+	.respTD {
+		width: 20%;
+	}
+	.bharat_sarakar, .gov_india_citizen {
+		font-size: 90%;
+	}
+	.width_20 {
+		width: 20px;
+	}
+	.dis_none {
+		display: none !important;
+	}
+}
+
+.no-gutters {
+	margin-right: 0;
+	margin-left: 0; > . col , > [class*="col-"] { padding-right : 0;
+	padding-left: 0;
+}
+
+}
+.vahan-tri-color {
+	width: auto;
+	height: 80px;
+}
+
+@media screen and (max-width: 500px) {
+	.ui-dialog {
+		width: 98% !important;
+		margin: 0 auto !important;
+		left: 1% !important;
+	}
+	.vahan-tri-color {
+		width: 100%;
+		height: auto;
+	}
+}
+
+.alert-info {
+    color: #0c5460;
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+}
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+.alert {
+    position: relative;
+    font-size:1rem;
+    padding: .75rem 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: .25rem;
+}
