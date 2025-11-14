@@ -5,14 +5,11 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.tomcat.util.codec.binary.Base64;
+import org.apache.commons.codec.binary.Base64;
 
 public class DmsUploadUtil {
-//    public static final String key = "VCSToken";
-//    private static final String characterEncoding = "UTF-8";
-//    private static final String cipherTransformation = "AES/CBC/PKCS5Padding";
-//    private static final String aesEncryptionAlgorithm = "AES";
-
+	
+	
 	public static byte[] getKeyBytes(String key) throws UnsupportedEncodingException {
 		byte[] keyBytes = new byte[16];
 		byte[] parameterKeyBytes = key.getBytes(CommonConstant.characterEncoding);
@@ -27,8 +24,8 @@ public class DmsUploadUtil {
 			byte[] keyBytes = getKeyBytes(key);
 			return new String(decrypt(cipheredBytes, keyBytes, keyBytes), CommonConstant.characterEncoding);
 		} catch (Exception e) {
-			//
 			e.printStackTrace();
+
 		}
 		return null;
 
@@ -46,7 +43,6 @@ public class DmsUploadUtil {
 			return cipherText;
 		} catch (Exception e) {
 			e.printStackTrace();
-
 		}
 		return null;
 

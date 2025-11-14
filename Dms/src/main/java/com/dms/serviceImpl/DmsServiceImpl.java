@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
 public class DmsServiceImpl implements DmsService {
 	ObjectMapper mapper = new ObjectMapper();
-	DmsRequestForServiceDto dmsRequestForServiceDto;
+	private DmsRequestForServiceDto dmsRequestForServiceDto;
 
 	@Override
 	public DmsDocumentDto getListOfDocFromService(DmsRequestDto dmsRequestDto)
