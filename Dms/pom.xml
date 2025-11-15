@@ -65,6 +65,15 @@
 			<artifactId>commons-codec</artifactId>
 			<version>1.7</version>
 		</dependency>
+		<dependency>
+			<groupId>com.dms</groupId>
+			<artifactId>dms-vahan-rest</artifactId>
+			<version>1.0.0</version>
+			<scope>system</scope>
+			<systemPath>D:/DMSWORKSPACE/abc/Dms/lib/dms-vahan-rest.jar</systemPath>
+		</dependency>
+
+
 	</dependencies>
 
 	<build>

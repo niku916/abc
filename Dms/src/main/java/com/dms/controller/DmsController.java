@@ -3,6 +3,7 @@ package com.dms.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dms.dto.DmsDocumentDto;
@@ -21,10 +22,10 @@ public class DmsController {
 	private final DmsService dmsService;
 
 	@PostMapping("/getListOfDocument")
-	public CommonResponse<?> getListOfDoc(@RequestBody DmsRequestDto dmsRequestDto)
+	public CommonResponse<?> getListOfDoc(@RequestParam(required = false) String dmsRequest)
 			throws JsonMappingException, JsonProcessingException {
 
-		DmsDocumentDto listOfDocFromService = dmsService.getListOfDocFromService(dmsRequestDto);
+		DmsDocumentDto listOfDocFromService = dmsService.getListOfDocFromService(dmsRequest);
 		return new CommonResponse(ResponseStatusDesc.SUCCESS.getValue(), listOfDocFromService, HttpStatus.OK, false);
 
 	}

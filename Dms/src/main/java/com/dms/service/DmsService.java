@@ -7,6 +7,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 public interface DmsService {
 
-	public DmsDocumentDto getListOfDocFromService(DmsRequestDto dmsRequestDto) throws JsonMappingException, JsonProcessingException;
+	public DmsDocumentDto getListOfDocFromService(String dmsRequest) throws JsonMappingException, JsonProcessingException;
 
 }

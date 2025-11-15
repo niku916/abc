@@ -17,10 +17,9 @@ public class DmsServiceImpl implements DmsService {
 	private DmsRequestForServiceDto dmsRequestForServiceDto;
 
 	@Override
-	public DmsDocumentDto getListOfDocFromService(DmsRequestDto dmsRequestDto)
+	public DmsDocumentDto getListOfDocFromService(String dmsRequest)
 			throws JsonMappingException, JsonProcessingException {
-		String data = dmsRequestDto.getDmsRequest();
-		data = data.replace("%2b", "+");
+		String data = dmsRequest.replace("%2b", "+");
 		String jsonData = DmsUploadUtil.decrypt(data, CommonConstant.TOKEN);
 		DmsRequestForServiceDto dmsRequestForServiceDto = readJsondata(jsonData);
 		return new DmsDocumentDto();
