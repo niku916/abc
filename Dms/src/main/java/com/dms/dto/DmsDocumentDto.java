@@ -52,5 +52,7 @@ public class DmsDocumentDto {
 	private Object owCode;
 	@JsonIgnore
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+	private Integer offCode;
+	private String statusCode;
 
 }

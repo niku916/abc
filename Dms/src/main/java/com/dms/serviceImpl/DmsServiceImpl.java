@@ -1,6 +1,9 @@
 package com.dms.serviceImpl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.dms.Client.Client;
 import com.dms.dto.DmsDocumentDto;
 import com.dms.dto.request.DmsRequestDto;
 import com.dms.dto.request.DmsRequestForServiceDto;
@@ -13,8 +16,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class DmsServiceImpl implements DmsService {
-	ObjectMapper mapper = new ObjectMapper();
+	private ObjectMapper mapper = new ObjectMapper();
 	private DmsRequestForServiceDto dmsRequestForServiceDto;
+	@Autowired
+	private Client client;
 
 	@Override
 	public DmsDocumentDto getListOfDocFromService(String dmsRequest)
@@ -22,7 +27,10 @@ public class DmsServiceImpl implements DmsService {
 		String data = dmsRequest.replace("%2b", "+");
 		String jsonData = DmsUploadUtil.decrypt(data, CommonConstant.TOKEN);
 		DmsRequestForServiceDto dmsRequestForServiceDto = readJsondata(jsonData);
-		return new DmsDocumentDto();
+
+		DmsDocumentDto dmsDocumentDto = client.getListofDocToUploadOrUploaded(dmsRequestForServiceDto);
+
+		return dmsDocumentDto;
 	}
 
 	public DmsRequestForServiceDto readJsondata(String jsonData) throws JsonMappingException, JsonProcessingException {
