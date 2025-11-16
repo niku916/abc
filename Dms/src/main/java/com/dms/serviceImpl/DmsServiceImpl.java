@@ -2,10 +2,7 @@ package com.dms.serviceImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.dms.Client.Client;
 import com.dms.dto.DmsDocumentDto;
-import com.dms.dto.request.DmsRequestDto;
 import com.dms.dto.request.DmsRequestForServiceDto;
 import com.dms.service.DmsService;
 import com.dms.utils.CommonConstant;
@@ -16,10 +13,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class DmsServiceImpl implements DmsService {
-	private ObjectMapper mapper = new ObjectMapper();
-	private DmsRequestForServiceDto dmsRequestForServiceDto;
 	@Autowired
-	private Client client;
+	private ObjectMapper mapper;
+	@Autowired
+	private ExternalService externalService;
+	private DmsRequestForServiceDto dmsRequestForServiceDto;
+
 
 	@Override
 	public DmsDocumentDto getListOfDocFromService(String dmsRequest)
@@ -28,7 +27,7 @@ public class DmsServiceImpl implements DmsService {
 		String jsonData = DmsUploadUtil.decrypt(data, CommonConstant.TOKEN);
 		DmsRequestForServiceDto dmsRequestForServiceDto = readJsondata(jsonData);
 
-		DmsDocumentDto dmsDocumentDto = client.getListofDocToUploadOrUploaded(dmsRequestForServiceDto);
+		DmsDocumentDto dmsDocumentDto = externalService.getListofDocToUploadOrUploaded(dmsRequestForServiceDto);
 
 		return dmsDocumentDto;
 	}
