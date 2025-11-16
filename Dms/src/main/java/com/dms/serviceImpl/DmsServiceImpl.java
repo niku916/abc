@@ -10,6 +10,7 @@ import com.dms.utils.DmsUploadUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.np.dms.dto.ResponseDto;
 
 @Service
 public class DmsServiceImpl implements DmsService {
@@ -27,9 +28,9 @@ public class DmsServiceImpl implements DmsService {
 		String jsonData = DmsUploadUtil.decrypt(data, CommonConstant.TOKEN);
 		DmsRequestForServiceDto dmsRequestForServiceDto = readJsondata(jsonData);
 
-		DmsDocumentDto dmsDocumentDto = externalService.getListofDocToUploadOrUploaded(dmsRequestForServiceDto);
+		DmsDocumentDto response  = externalService.getListofDocToUploadOrUploadeds(dmsRequestForServiceDto);
 
-		return dmsDocumentDto;
+		return response;
 	}
 
 	public DmsRequestForServiceDto readJsondata(String jsonData) throws JsonMappingException, JsonProcessingException {

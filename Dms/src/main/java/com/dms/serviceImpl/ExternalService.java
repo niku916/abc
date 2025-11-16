@@ -1,91 +1,145 @@
 package com.dms.serviceImpl;
 
-import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import com.dms.configuration.WebClientConfiguration.WebClientFactory;
 import com.dms.dto.DmsDocumentDto;
+import com.dms.dto.DocumentDetailDto;
+import com.dms.dto.SubcategoryMasterDataDto;
+import com.dms.dto.SubcategoryMasterDataListDto;
 import com.dms.dto.request.DmsRequestForServiceDto;
-
-import reactor.core.publisher.Mono;
+import com.np.dms.client.DmsRestClient;
+import com.np.dms.dto.CategoryMasterDataDto;
+import com.np.dms.dto.RequestDataDto;
+import com.np.dms.dto.ResponseDto;
 
 @Service
 public class ExternalService {
 
 	private static final Logger logger = LogManager.getLogger(ExternalService.class);
 
-	@Autowired
-	private WebClientFactory webClientFactory;
+	@Value("${dms.url.staging}")
+	private String dmsStagingServicesUrl;
+	@Value("${dms.url.prod}")
+	private String dmsProdServicesUrl;
+	
 
-	/**
-	 * Calls the DMS API using the same headers/signature logic as the provided JAR.
-	 * This method obtains headers from the JAR's private getHeader() via reflection,
-	 * computes the signature using the jar's SignatureUtil, adds it to headers and
-	 * performs a POST to the exact URL pattern the jar uses.
-	 */
-	public DmsDocumentDto getListofDocToUploadOrUploaded(DmsRequestForServiceDto requestDto) {
-
-		// base values used by the jar usage in your project
-		final String baseUrl = "https://staging.parivahan.nic.in/dms-app/common-app";
-		final String apiMethod = "common-app";   // second constructor arg in JAR usage
-		final String className = "VtDocuments";  // third constructor arg in JAR usage
-		final String finalUrl = baseUrl + "/" + apiMethod + "/" + className;
-
-		// get headers from the jar's private static getHeader() using reflection
-		HttpHeaders headersFromJar;
+	public DmsDocumentDto getListofDocToUploadOrUploadeds(DmsRequestForServiceDto dmsRequest) {
+		ResponseDto response = null;
+		
 		try {
-			Class<?> dmsRestClientClazz = Class.forName("com.np.dms.client.DmsRestClient");
-			Method getHeaderMethod = dmsRestClientClazz.getDeclaredMethod("getHeader");
-			getHeaderMethod.setAccessible(true);
-			Object headerObj = getHeaderMethod.invoke(null); // static method, target null
-			if (!(headerObj instanceof HttpHeaders)) {
-				throw new IllegalStateException("DmsRestClient.getHeader() did not return HttpHeaders");
+			DmsRestClient restClient = new DmsRestClient(dmsStagingServicesUrl, "common-app", "VtDocuments");
+			response = restClient.invokCitizenConfDocument(vahanCitizenConf(dmsRequest));
+			if (response != null) {
+				DmsDocumentDto dmsDocument = fillaldetails(response);
+				dmsDocument.setApplno(dmsRequest.getApplNo());
+				return dmsDocument;
 			}
-			headersFromJar = (HttpHeaders) headerObj;
+
 		} catch (Exception e) {
-			logger.error("Failed to obtain headers from DmsRestClient.getHeader(): {}", e.getMessage(), e);
-			throw new RuntimeException("Cannot build headers for DMS call", e);
+			logger.error("getListofDocToUploadOrUploaded " + e.getMessage());
+			return null;
 		}
-
-		// compute signature exactly like the jar does and add to headers
-		String timestamp = headersFromJar.getFirst("timestamp");
-		// NOTE: second parameter must match serviceParameter.getParameter() used in the jar.
-		// Earlier usage showed "common-app" passed; keep consistent.
-		String signature = com.np.dms.utils.SignatureUtil.getSignature(apiMethod, apiMethod, className, timestamp,
-				requestDto);
-		headersFromJar.add("signature", signature);
-
-		// Build a WebClient instance (we set headers per-request below to ensure fresh timestamp)
-		WebClient client = WebClient.builder().build();
-
-		try {
-			return client.post()
-					.uri(finalUrl) // absolute URL
-					.headers(h -> h.addAll(headersFromJar))
-					.contentType(MediaType.APPLICATION_JSON)
-					.accept(MediaType.APPLICATION_JSON)
-					.bodyValue(requestDto)
-					.retrieve()
-					.onStatus(status -> !status.is2xxSuccessful(),
-							resp -> resp.bodyToMono(String.class)
-									.flatMap(body -> Mono.<Throwable>error(new RuntimeException(
-											"Upstream error " + resp.statusCode() + " : " + body))))
-					.bodyToMono(DmsDocumentDto.class)
-					.block();
-		} catch (WebClientResponseException ex) {
-			logger.error("Upstream returned status {} body: {}", ex.getRawStatusCode(), ex.getResponseBodyAsString());
-			throw ex;
-		} catch (Exception ex) {
-			logger.error("Error calling DMS: {}", ex.getMessage(), ex);
-			throw new RuntimeException(ex);
-		}
+		return null;
 	}
+	
+	private static RequestDataDto vahanCitizenConf(DmsRequestForServiceDto dmsRequest) {
+		RequestDataDto req = new RequestDataDto();
+		try {
+			req.setAppNo(dmsRequest.getApplNo());
+			req.setState(dmsRequest.getStateCd());
+			req.setPurposeCode(dmsRequest.getPurCd());
+			req.setRegNo(dmsRequest.getRegnNo());
+			req.setAuthMode(dmsRequest.getAuthType());
+			req.setServiceRgn(dmsRequest.getServiceRgn());
+			req.setVhClassType(String.valueOf(dmsRequest.getVhClassType()));
+			// System.out.println(req.toString());
+		} catch (Exception ex) {
+			logger.error("vahanCitizenConf " + ex.getCause(), ex);
+		}
+		return req;
+	}
+	
+	public DmsDocumentDto fillaldetails(ResponseDto response) {
+		DmsDocumentDto returndobj = new DmsDocumentDto();
+		try {
+			List<DocumentDetailDto> mandatelist = new ArrayList<>();
+			List<DocumentDetailDto> NonUploadedlist = new ArrayList<>();
+			List<DocumentDetailDto> uploadedlist = new ArrayList<>();
+			mandatelist = fillAllListOfDMS(response.getUploadDataDto().getMandatoryList());
+			NonUploadedlist = fillAllListOfDMS(response.getUploadDataDto().getNonUploadedList());
+			uploadedlist = fillAllListOfDMS(response.getUploadDataDto().getUploadedList());
+			returndobj.setMandatoryList(mandatelist);
+			returndobj.setNonUploadedList(NonUploadedlist);
+			returndobj.setUploadedList(uploadedlist);
+			returndobj.setDocFrom(response.getUploadDataDto().getDocFrom());
+			returndobj.setPurposeName(response.getUploadDataDto().getPurposeName());
+			returndobj.setStatusCode(response.getStatusCode());
+		} catch (Exception e) {
+			logger.error("fillaldetails " + e.getMessage());
+		}
+		return returndobj;
+	}
+	
+	public List<DocumentDetailDto> fillAllListOfDMS(List<CategoryMasterDataDto> list) {
+		List<DocumentDetailDto> docList = new ArrayList<>();
+		try {
+			if (list != null && list.size() > 0) {
+				for (CategoryMasterDataDto manDate : list) {
+					DocumentDetailDto dobj = new DocumentDetailDto();
+					dobj.setCatName(manDate.getCatName());
+					dobj.setCatId(manDate.getCatId());
+					dobj.setMandatory(manDate.getMandatory());
+					dobj.setDocUploaded(manDate.isDocUploaded());
+					dobj.setFileName(manDate.getFileName());
+					dobj.setUniqueRefNo(manDate.getUniqueRefNo());
+					dobj.setDocVerified(manDate.isDocVerified());
+					dobj.setDocApproved(manDate.isDocApproved());
+					dobj.setDocRecieved(manDate.isDocRecieved());
+					dobj.setTempDocApproved(manDate.isTempDocApproved());
+					if (dobj.getSubcategoryMasterData() == null) {
+						dobj.setSubcategoryMasterData(new SubcategoryMasterDataDto());
+					}
+					if (dobj.getSubcategoryMasterDataList() == null || dobj.getSubcategoryMasterDataList().isEmpty()) {
+						dobj.setSubcategoryMasterDataList(new ArrayList<>());
+					}
+					if (manDate.getSubcategoryMasterData() != null) {
+						dobj.getSubcategoryMasterData().setCatId(manDate.getSubcategoryMasterData().getCat_id());
+						dobj.getSubcategoryMasterData()
+								.setSubCatId(Integer.parseInt(manDate.getSubcategoryMasterData().getSub_cat_id()));
+						dobj.getSubcategoryMasterData()
+								.setSubCatName(manDate.getSubcategoryMasterData().getSub_cat_name());
+					}
+					if (manDate.getSubcategoryMasterDataList() != null
+							&& !manDate.getSubcategoryMasterDataList().isEmpty()) {
+						for (com.np.dms.db.pojos.SubcategoryMasterData ff : manDate.getSubcategoryMasterDataList()) {
+							SubcategoryMasterDataListDto tt = new SubcategoryMasterDataListDto();
+							tt.setCatId(ff.getCat_id());
+							tt.setSubCatId(ff.getSub_cat_id());
+							tt.setSubCatName(ff.getSub_cat_name());
+							dobj.getSubcategoryMasterDataList().add(tt);
+						}
+					}
+
+					dobj.setObjectId(manDate.getObjectId());
+					dobj.setFile(manDate.getFile());
+					dobj.setApiFile(manDate.getApiFile());
+					dobj.setMessage(manDate.getMessage());
+					dobj.setDocUploadedDate(manDate.getDocUploadedDate());
+					dobj.setDocUrl(manDate.getDocUrl());
+					docList.add(dobj);
+				}
+			}
+
+		} catch (Exception e) {
+			logger.error("fillAllListOfDMS " + e.getMessage());
+		}
+		return docList;
+	}
+	
 }
