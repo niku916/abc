@@ -6,6 +6,7 @@ import java.util.Map;
 import com.dms.dto.TmEsignDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
 
@@ -22,7 +23,9 @@ public class DmsRequestForServiceDto {
 	private Integer officeCd;
 	private String serviceRgn = "0";
 	private Integer vhClassType;
+	@JsonProperty("jKey")
 	private String jKey;
+	@JsonProperty("jSecurityKey")
 	private String jSecurityKey;
 	private String docOperationType;
 	private boolean esignFlag;
