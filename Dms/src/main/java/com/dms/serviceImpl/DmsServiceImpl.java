@@ -18,8 +18,6 @@ public class DmsServiceImpl implements DmsService {
 	private ObjectMapper mapper;
 	@Autowired
 	private ExternalService externalService;
-	private DmsRequestForServiceDto dmsRequestForServiceDto;
-
 
 	@Override
 	public DmsDocumentDto getListOfDocFromService(String dmsRequest)
@@ -28,12 +26,13 @@ public class DmsServiceImpl implements DmsService {
 		String jsonData = DmsUploadUtil.decrypt(data, CommonConstant.TOKEN);
 		DmsRequestForServiceDto dmsRequestForServiceDto = readJsondata(jsonData);
 
-		DmsDocumentDto response  = externalService.getListofDocToUploadOrUploadeds(dmsRequestForServiceDto);
+		DmsDocumentDto response = externalService.getListofDocToUploadOrUploadeds(dmsRequestForServiceDto);
 
 		return response;
 	}
 
 	public DmsRequestForServiceDto readJsondata(String jsonData) throws JsonMappingException, JsonProcessingException {
+		DmsRequestForServiceDto dmsRequestForServiceDto = null;
 
 		if (jsonData != null) {
 			dmsRequestForServiceDto = mapper.readValue(jsonData, DmsRequestForServiceDto.class);
